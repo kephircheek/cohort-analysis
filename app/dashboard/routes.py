@@ -1,0 +1,3 @@
+"""
+Dashboard routes definition.
+"""
