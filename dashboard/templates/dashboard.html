@@ -1,0 +1,21 @@
+{% extends "header.html" %}
+{% block subblock %}
+	<div class="row">
+		<div class="col-4">
+		  <form action="/plot" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          {% for control in dashboard["controls"] %}
+            <label for={{ control["id"] }}>{{ control["label"] }}</label>
+            <select name={{control["id"]}} class="form-control" id={{ control["id"] }}>
+              {% for option in control["options"] %}
+                <option> {{ option }} </option>
+              {% endfor %}
+            </select>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ dashboard["submit"] }} </button>
+      </form>
+		</div>
+  </div>
+{% endblock %}
+

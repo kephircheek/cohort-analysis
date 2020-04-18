@@ -10,10 +10,18 @@
 		<title>Cohort analys</title> 
 	</head>
 	
-	<body style="height: 100%;">
-		{% block subblock %}
+	<body>
+    <div class="container-fuild">
+		  <div class="row align-items-center justify-content-lg-center">
+				<div class="col-4">
+					<h3 class="display-3 text-center"> 
+              {{status_line["label"]}}
+          </h3>
+				</div>
+      </div>
+      {% block subblock %}
 
-		{% endblock %}
+      {% endblock %}
+    </div>
 	</body> 
-
 </html>
