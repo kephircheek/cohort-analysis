@@ -4,18 +4,37 @@
 		<div class="col-4">
 		  <form action="/plot" method="POST" enctype="multipart/form-data">
         <div class="form-group">
-          {% for control in dashboard["controls"] %}
-            <label for={{ control["id"] }}>{{ control["label"] }}</label>
-            <select name={{control["id"]}} class="form-control" id={{ control["id"] }}>
+          {% for id, control in dashboard["controls"].items() %}
+            <label for={{ id }}>{{ control["label"] }}</label>
+            <select name={{ id }} class="form-control" id={{ id }}>
               {% for option in control["options"] %}
                 <option> {{ option }} </option>
               {% endfor %}
             </select>
           {% endfor %}
+          <label for="file"> Файл </label>
+          <select name="file" class="form-control" id="file">
+            {% for file in files %}
+              <option> {{ file }} </option>
+            {% endfor %}
+          </select>
         </div>
         <button type="submit" class="btn btn-primary">{{ dashboard["submit"] }} </button>
       </form>
 		</div>
+    <div class="col-8">
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+      <h5> Графики <h5>
+          {% for figure in figures %}
+            <div class="chart" id="linechart">
+              <script>
+                var graphs = {{figure | safe}};
+                Plotly.newPlot('linechart', graphs.data, graphs.layout);
+              </script>
+            </div>
+          {% endfor %}
+    </div>
   </div>
 {% endblock %}
 

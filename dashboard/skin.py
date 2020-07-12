@@ -1,39 +1,48 @@
+from collections import OrderedDict
 STATUS_LINE = {
     "label": "Когортный анaлиз"
 }
 
 DASHBOARD = {
     "submit": "Построить графики",
-    "controls": [
-        {
-            "id": "cohort_types",
-            "label": "Тип когорты",
-            "options": [
-                "Дата первого посещения",
-                "Другой тип когорты..."
-            ]
-        },
-        {
-            "id": "cohort_sizes",
-            "label": "Размер когорты",
-            "options": [
-                "по месяцам"
-            ]
-        },
-        {
-            "id": "targets",
-            "label": "Показатель",
-            "options": [
-            ]
-        },
-        {
-            "id": "date_range",
-            "label": "Диапозон дат",
-            "options": [
-                "За последний месяц",
-                "За последние два месяца"
-            ]
-        }
+    "controls": OrderedDict([
+        (
+            "cohort_type",
+            {
+                "label": "Тип когорты",
+                "options": OrderedDict([
+                    ("Дата первого посещения", "JoinMonth"),
+                ])
+            }
+        ),
+        (
+            "cohort_range",
+            {
+                "label": "Размер когорты",
+                "options": OrderedDict([
+                    ("по месяцам", "month")
+                ])
+            }
+        ),
+        (
+            "target", {
+                "label": "Показатель",
+                "options": OrderedDict([
+                    ("Пользователей", 'users')
+                ])
+            }
+        ),
+        (
+            "date_range", {
+                "label": "Диапозон дат",
+                "options": OrderedDict([
+                    ("За последний месяц", "month") ,
+                    ("За квартал", 'quarter'),
+                    ("За полгода", 'half-year'),
+                    ("За год", 'year')
+                ])
+            }
+        )
 
-    ]
+    ])
 }

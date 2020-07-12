@@ -4,12 +4,14 @@ Routes will add here.
 """
 
 import os
+import json
 import shutil
 from uuid import uuid4
 from flask import Flask, render_template, redirect, url_for, request, session
 
 from dashboard.skin import DASHBOARD, STATUS_LINE
-from dashboard.tools import load
+from dashboard.tools import load, write, createfigure
+from analytics.core import CohortAnalyser
 
 import logging
 logging.basicConfig(
@@ -26,7 +28,9 @@ app.config.from_object('config')
 if 'storage' not in os.listdir('.'):
     os.makedirs('storage')
 
-# app routes
+
+# App routes
+
 
 @app.route('/')
 @app.route('/welcome', methods=['GET'])
@@ -66,12 +70,25 @@ def plot():
     if 'token' not in session:
         logging.debug(f"Not token in session: redirect to welcome.")
         return redirect(url_for('welcome'))
-    logging.debug(f"Posted plot form:\n"
-                  f"args: {request.args}\n"
-                  f"form: {request.form}\n"
-                  f"valus: {request.values}"
-    )
+    logging.debug(f"Posted plot form: {request.form}")
+    # [('cohort_types', 'Дата первого посещения'), ('cohort_sizes', 'по
+    # месяцам'), ('targets', 'Пользователей'), ('date_range', 'За год')]
     token = session['token']
+    data = {
+        "token": token,
+        "filename": request.form['file']
+    }
+
+    ch = CohortAnalyser(
+        target=DASHBOARD['controls']['target']['options'][request.form['target']],
+        cohort_type=DASHBOARD['controls']['cohort_type']['options'][request.form['cohort_type']],
+        cohort_range=DASHBOARD['controls']['cohort_range']['options'][request.form['cohort_range']],
+        date_range=DASHBOARD['controls']['date_range']['options'][request.form['date_range']]
+    )
+
+    for result in ch.analyse(data):
+        write(result, token, 'figures')
+
     logging.debug(f"Make figures for user with token: {token}")
     return redirect(url_for('dashboard'))
 
@@ -79,12 +96,13 @@ def plot():
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
     token = session['token']
-    figures = [load(fig) for fig in os.listdir(f"storage/{token}/figures")]
+    figures = [createfigure(json.loads(fig)) for fig in load(token, 'figures')]
     logging.debug(f'Loaded {len(figures)} figures.')
-    logging.debug(f"Render dashboard page.")
+    logging.debug("Render dashboard page.")
     return render_template(
         'dashboard.html',
         dashboard=DASHBOARD,
         status_line=STATUS_LINE,
+        files=os.listdir(f"storage/{token}/data"),
         figures=figures)
 
